@@ -3,7 +3,7 @@
 #
 
 # 이 프로젝트의 실행 파일에 소스를 추가합니다.
-add_executable (LinuxSystemProgramming "LinuxSystemProgramming.cpp" "LinuxSystemProgramming.h" "FdRAII/FDRAII.cpp")
+add_executable (LinuxSystemProgramming "LinuxSystemProgramming.cpp" "LinuxSystemProgramming.h" "SystemUtils/FDGuard.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET LinuxSystemProgramming PROPERTY CXX_STANDARD 20)

@@ -3,8 +3,11 @@
 #include "../SystemUtils/FDGuard.h"
 #include <algorithm>
 #include <string>
+#include <sstream>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cstring>
+#include <sys/stat.h>
 
 namespace bank {
 
@@ -25,7 +28,7 @@ namespace bank {
 
     std::vector<std::string> Bank::printAllAccount() const {
         std::vector<std::string> res;
-        for (const auto& account : accountList)
+        for (const auto& account : accountList) 
             res.push_back(account->printAccountInfo());
 
         return res;
@@ -41,13 +44,58 @@ namespace bank {
                 std::to_string(account->getId()) + "," + 
                 account->getOwnerName() + "," + 
                 std::to_string(account->getBalance()) + "\n";
-            write(fd.get(), line.c_str(), line.size());
+            ssize_t written = write(fd.get(), line.c_str(), line.size());
+            if (written == -1) throw std::runtime_error(std::string("creat failed: ") + strerror(errno));
         }
     }
 
-    void Bank::load(std::string& filename) {
+    struct AccountData {
+        std::string type;
+        int id;
+        std::string ownerName;
+        int money;
+    };
+
+    AccountData parsAccountLine(const std::string& line) {
+        std::vector<std::string> tokens;
+        std::stringstream ss(line);
+        std::string token;
+        while (std::getline(ss, token, ',')) tokens.push_back(token);
+
+        return AccountData(
+            tokens[0], 
+            std::stoi(tokens[1]), 
+            tokens[2], 
+            std::stoi(tokens[3])
+        );
+    }
+
+    std::unique_ptr<BankAccount> createAccount(const AccountData& data) {
+        if      (data.type == "SavingsAccount")     return std::make_unique<SavingsAccount> (data.id, data.ownerName, data.money);
+        else if (data.type == "CheckingAccount")    return std::make_unique<CheckingAccount>(data.id, data.ownerName, data.money);
+        else if (data.type == "BankAccount")        return std::make_unique<BankAccount>    (data.id, data.ownerName, data.money);
+
+        throw std::runtime_error("unknown account error: " + data.type);
+    }
+
+    void Bank::load(const std::string& filename) {
         FDGuard fd(open(filename.c_str(), O_RDONLY));
         if (fd.get() == -1) throw std::runtime_error(std::string("open failed: ") + strerror(errno));
 
+        struct stat st;
+        fstat(fd.get(), &st);
+        std::vector<char> buffer(st.st_size);
+        ssize_t bytesRead = read(fd.get(), buffer.data(), buffer.size());
+        if(bytesRead == -1) throw std::runtime_error(std::string("read failed: ") + strerror(errno));
+
+        std::vector<AccountData> datas;
+        std::string content(buffer.data(), buffer.size());
+        std::stringstream ss(content);
+        std::string dataLine;
+        while (std::getline(ss, dataLine))
+            datas.push_back(parsAccountLine(dataLine));
+        
+        for (const AccountData& accountData : datas)
+            accountList.push_back(createAccount(accountData));
     }
 }

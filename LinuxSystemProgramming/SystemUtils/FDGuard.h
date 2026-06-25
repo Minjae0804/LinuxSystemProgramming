@@ -1,3 +1,5 @@
+#pragma once
+#include <unistd.h>
 
 class FDGuard {
 	int fd;
