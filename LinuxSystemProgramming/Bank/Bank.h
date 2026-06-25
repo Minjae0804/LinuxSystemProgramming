@@ -13,5 +13,7 @@ namespace bank {
         int addAccount(const BankAccount& account);
         BankAccount* findAccount(int id);
         std::vector<std::string> printAllAccount() const;
+        void save(const std::string& filename);
+        void load(std::string& filename);
     };
 }

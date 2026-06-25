@@ -17,6 +17,7 @@ namespace bank {
 		int getId() const { return id; }
 		int getBalance() const { return money; }
         const std::string& getOwnerName() const { return ownerName; }
+		virtual std::string getType() { return "BankAccount"; }
 
 		void deposit(int money) { this->money += money; }
 		virtual bool withdrawal(int money);
@@ -35,12 +36,14 @@ namespace bank {
 	public:
 		SavingsAccount(const std::string& ownerName, int money = 0) : BankAccount(ownerName, money) {}; 
 		BankAccount* clone() const override { return new SavingsAccount(*this); }
+		std::string getType() override { return "SavingsAccount"; }
 	};
 
 	class CheckingAccount : public BankAccount {
 	public:
 		CheckingAccount(const std::string& ownerName, int money = 0) : BankAccount(ownerName, money) {};
 		BankAccount* clone() const override { return new CheckingAccount(*this); }
+		std::string getType() override { return "CheckingAccount"; }
 	protected:
 		int getFee() const override { return 100; }
 	};
