@@ -1,6 +1,7 @@
 #pragma once
 #include <unistd.h>
 
+// 파일 디스크립터용 RAII
 class FDGuard {
 	int fd;
 public:

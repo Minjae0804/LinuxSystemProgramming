@@ -4,6 +4,7 @@
 
 namespace bank {
 
+	// 계좌 클래스
 	class BankAccount {
 		static int nextId;
 		int id;
@@ -14,7 +15,7 @@ namespace bank {
 		BankAccount(const std::string& ownerName, int money = 0) 
 			: id(nextId++), ownerName(ownerName), money(money) {}; 
 		BankAccount(int id, const std::string& ownerName, int money) 
-			: id(id), ownerName(ownerName), money(money) { if (id >= nextId) nextId = id + 1; }
+			: id(id == -1 ? nextId++ : id), ownerName(ownerName), money(money) { if (this->id >= nextId) nextId = id + 1; }
 		virtual ~BankAccount() {}; 
 
 		int getId() const { return id; }
@@ -22,19 +23,20 @@ namespace bank {
         const std::string& getOwnerName() const { return ownerName; }
 		virtual std::string getType() const { return "BankAccount"; }
 
-		void deposit(int money) { this->money += money; }
-		virtual bool withdrawal(int money);
+		void deposit(int money) { this->money += money; }	// 입금
+		virtual bool withdrawal(int money);					// 출금
 
-        std::string printAccountInfo() const;
+        std::string printAccountInfo() const;				// 해당 계좌의 주인 및 잔액을 문자열로 반환
 
         static void swap(BankAccount& lhs, BankAccount& rhs) noexcept;
 
 		virtual BankAccount* clone() const { return new BankAccount(*this); }
 
 	protected:
-		virtual int getFee() const { return 0; }
+		virtual int getFee() const { return 0; }			// 출금 수수료
 	};
 
+	// 저축계좌 클래스
 	class SavingsAccount : public BankAccount {
 	public:
 		SavingsAccount(const std::string& ownerName, int money = 0) : BankAccount(ownerName, money) {};
@@ -43,6 +45,7 @@ namespace bank {
 		std::string getType() const override { return "SavingsAccount"; }
 	};
 
+	// 직불계좌 클래스
 	class CheckingAccount : public BankAccount {
 	public:
 		CheckingAccount(const std::string& ownerName, int money = 0) : BankAccount(ownerName, money) {};
@@ -50,7 +53,7 @@ namespace bank {
 		BankAccount* clone() const override { return new CheckingAccount(*this); }
 		std::string getType() const override { return "CheckingAccount"; }
 	protected:
-		int getFee() const override { return 100; }
+		int getFee() const override { return 100; }			// 출금 수수료
 	};
 
 }

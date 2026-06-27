@@ -16,7 +16,7 @@ namespace bank {
 
         return accountList.back()->getId();
     }
-
+    
     BankAccount* Bank::findAccount(int id) {
         auto it = std::find_if(accountList.begin(), accountList.end(), 
             [&](const std::unique_ptr<BankAccount>& account) { return account->getId() == id; }
@@ -28,12 +28,12 @@ namespace bank {
 
     std::vector<std::string> Bank::printAllAccount() const {
         std::vector<std::string> res;
-        for (const auto& account : accountList) 
+        for (const auto& account : accountList)
             res.push_back(account->printAccountInfo());
 
         return res;
     }
-
+    
     void Bank::save(const std::string& filename) {
         FDGuard fd(creat(filename.c_str(), 0644));
         if (fd.get() == -1) throw std::runtime_error(std::string("creat failed: ") + strerror(errno));
@@ -49,6 +49,7 @@ namespace bank {
         }
     }
 
+    // 계좌 데이터를 임시 저장하는 구조체
     struct AccountData {
         std::string type;
         int id;
@@ -56,6 +57,7 @@ namespace bank {
         int money;
     };
 
+    // 파일 내 라인을 받고 계좌 데이터로 반환
     AccountData parsAccountLine(const std::string& line) {
         std::vector<std::string> tokens;
         std::stringstream ss(line);
@@ -70,14 +72,15 @@ namespace bank {
         );
     }
 
+    // 계좌 로드용 팩토리 함수
     std::unique_ptr<BankAccount> createAccount(const AccountData& data) {
-        if      (data.type == "SavingsAccount")     return std::make_unique<SavingsAccount> (data.id, data.ownerName, data.money);
-        else if (data.type == "CheckingAccount")    return std::make_unique<CheckingAccount>(data.id, data.ownerName, data.money);
-        else if (data.type == "BankAccount")        return std::make_unique<BankAccount>    (data.id, data.ownerName, data.money);
+        if      (data.type == "savings")     return std::make_unique<SavingsAccount> (data.id, data.ownerName, data.money);
+        else if (data.type == "checking")    return std::make_unique<CheckingAccount>(data.id, data.ownerName, data.money);
+        else if (data.type == "bank")        return std::make_unique<BankAccount>    (data.id, data.ownerName, data.money);
 
         throw std::runtime_error("unknown account error: " + data.type);
     }
-
+    
     void Bank::load(const std::string& filename) {
         FDGuard fd(open(filename.c_str(), O_RDONLY));
         if (fd.get() == -1) throw std::runtime_error(std::string("open failed: ") + strerror(errno));

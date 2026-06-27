@@ -15,7 +15,7 @@ namespace bank {
 
     std::string BankAccount::printAccountInfo() const {
         std::string info;
-        info += "owner name: " + ownerName + "\nmoney: " + std::to_string(this->money);
+        info += "owner: " + ownerName + "\nmoney: " + std::to_string(this->money);
 
         return info;
     }
