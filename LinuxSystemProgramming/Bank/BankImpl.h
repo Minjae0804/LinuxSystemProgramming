@@ -74,9 +74,9 @@ namespace bank {
 
     // 계좌 로드용 팩토리 함수
     std::unique_ptr<BankAccount> createAccount(const AccountData& data) {
-        if      (data.type == "savings")     return std::make_unique<SavingsAccount> (data.id, data.ownerName, data.money);
-        else if (data.type == "checking")    return std::make_unique<CheckingAccount>(data.id, data.ownerName, data.money);
-        else if (data.type == "bank")        return std::make_unique<BankAccount>    (data.id, data.ownerName, data.money);
+        if      (data.type == "SavingsAccount")     return std::make_unique<SavingsAccount> (data.id, data.ownerName, data.money);
+        else if (data.type == "CheckingAccount")    return std::make_unique<CheckingAccount>(data.id, data.ownerName, data.money);
+        else if (data.type == "BankAccount")        return std::make_unique<BankAccount>    (data.id, data.ownerName, data.money);
 
         throw std::runtime_error("unknown account error: " + data.type);
     }
