@@ -16,12 +16,14 @@ namespace bank {
 			: id(nextId++), ownerName(ownerName), money(money) {}; 
 		BankAccount(int id, const std::string& ownerName, int money) 
 			: id(id == -1 ? nextId++ : id), ownerName(ownerName), money(money) { if (this->id >= nextId) nextId = id + 1; }
-		virtual ~BankAccount() {}; 
+		virtual ~BankAccount() {}
 
 		int getId() const { return id; }
 		int getBalance() const { return money; }
         const std::string& getOwnerName() const { return ownerName; }
 		virtual std::string getType() const { return "BankAccount"; }
+
+		void setOwnerName(const std::string& newname) { this->ownerName = newname; }
 
 		void deposit(int money) { this->money += money; }	// 입금
 		virtual bool withdrawal(int money);					// 출금

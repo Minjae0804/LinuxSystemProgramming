@@ -34,6 +34,14 @@ int main() {
 				std::cout << "created new account. id: " << id << std::endl;
 			}
 		}, {
+			"delete", 2, "delete <id>", [&](const std::vector<std::string>& tokens) {
+				std::cout << (myBank->deleteAccount(std::stoi(tokens[1])) ? "delete complete." : "delete failed. account not found.") << std::endl;
+			}
+		}, {
+			"rename", 3, "rename <id> <newName>", [&](const std::vector<std::string>& tokens) {
+				std::cout << (myBank->updateAccountOwnername(std::stoi(tokens[1]), tokens[2]) ? "rename complete." : "rename failed. account not found.") << std::endl;
+			}
+		}, {
 			"deposit", 3, "deposit <id> <amount>", [&](const std::vector<std::string>& tokens) {
 				bank::BankAccount* acc = myBank->findAccount(std::stoi(tokens[1]));
 				acc->deposit(std::stoi(tokens[2]));
@@ -44,7 +52,7 @@ int main() {
 				bank::BankAccount* acc = myBank->findAccount(stoi(tokens[1]));
 				bool isComplete = acc->withdrawal(stoi(tokens[2]));
 				if (isComplete) std::cout << "withdraw complete. balance: " << acc->getBalance() << std::endl;
-				else std::cout << "withdraw fail. Insufficient balance." << std::endl;
+				else std::cout << "withdraw failed. Insufficient balance." << std::endl;
 			}
 		}, {
 			"transfer", 4, "transfer <fromId> <toId> <amount>", [&](const std::vector<std::string>& tokens) {
@@ -53,7 +61,7 @@ int main() {
 				bool isComplete = bank::transfer(*srcAcc, *dstAcc, stoi(tokens[3]));
 				if (isComplete) std::cout << "transfer complete.\nsrc's Balance: " << srcAcc->getBalance() 
 					<< "\ndst's Balance: " << dstAcc->getBalance() << std::endl;
-				else std::cout << "transfer fail. src's balance is insufficient." << std::endl;
+				else std::cout << "transfer failed. src's balance is insufficient." << std::endl;
 			}
 		}, {
 			"balance", 2, "balance <id>", [&](const std::vector<std::string>& tokens) {

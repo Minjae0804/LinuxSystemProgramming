@@ -8,8 +8,14 @@
 #include <unistd.h>
 #include <cstring>
 #include <sys/stat.h>
+#include <vector>
 
 namespace bank {
+    std::vector<std::unique_ptr<BankAccount>>::iterator Bank::findIterator(int id) {
+        return std::find_if(accountList.begin(), accountList.end(), 
+            [&](const std::unique_ptr<BankAccount>& account) { return account->getId() == id; }
+        );
+    }
 
     int Bank::addAccount(const BankAccount& account) {
         accountList.push_back(std::unique_ptr<BankAccount>(account.clone()));
@@ -18,12 +24,26 @@ namespace bank {
     }
     
     BankAccount* Bank::findAccount(int id) {
-        auto it = std::find_if(accountList.begin(), accountList.end(), 
-            [&](const std::unique_ptr<BankAccount>& account) { return account->getId() == id; }
-        );
+        auto it = findIterator(id);
         if (it == accountList.end()) throw std::runtime_error("account not found: " + std::to_string(id));
 
         return it->get();
+    }
+
+    bool Bank::deleteAccount(int id) {
+        auto it = findIterator(id);
+        if (it == accountList.end()) return false;
+        accountList.erase(it);
+
+        return true;
+    }
+
+    bool Bank::updateAccountOwnername(int id, const std::string& newname) {
+        auto it = findIterator(id);
+        if (it == accountList.end()) return false;
+        (*it)->setOwnerName(newname);
+
+        return true;
     }
 
     std::vector<std::string> Bank::printAllAccount() const {
