@@ -64,6 +64,12 @@ int main() {
 				else std::cout << "transfer failed. src's balance is insufficient." << std::endl;
 			}
 		}, {
+			"interest", 2, "interest <id>", [&](const std::vector<std::string>& tokens) {
+				bank::BankAccount* acc = myBank->findAccount(stoi(tokens[1]));
+				acc->payInterest();
+				std::cout << "interest payment complete." << std::endl;
+			}
+		}, {
 			"balance", 2, "balance <id>", [&](const std::vector<std::string>& tokens) {
 				bank::BankAccount* acc = myBank->findAccount(std::stoi(tokens[1]));
 				std::cout << acc->printAccountInfo() << std::endl;
@@ -113,7 +119,6 @@ int main() {
 			for (const Command& com : commands) {
 				if(com.usage.empty())	std::cout << com.command	<< std::endl; 
 				else					std::cout << com.usage		<< std::endl;
-
 				continue;
 			}
 		}

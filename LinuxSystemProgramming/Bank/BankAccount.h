@@ -27,6 +27,7 @@ namespace bank {
 
 		void deposit(int money) { this->money += money; }	// 입금
 		virtual bool withdrawal(int money);					// 출금
+		void payInterest() { this->money += this->getInterest(); }	// 이자 지급
 
         std::string printAccountInfo() const;				// 해당 계좌의 주인 및 잔액을 문자열로 반환
 
@@ -36,6 +37,7 @@ namespace bank {
 
 	protected:
 		virtual int getFee() const { return 0; }			// 출금 수수료
+		virtual int getInterest() { return 0; }
 	};
 
 	// 저축계좌 클래스
@@ -45,6 +47,8 @@ namespace bank {
 		SavingsAccount(int id, const std::string& ownerName, int money) : BankAccount(id, ownerName, money) {}
 		BankAccount* clone() const override { return new SavingsAccount(*this); }
 		std::string getType() const override { return "SavingsAccount"; }
+	protected:
+		int getInterest() { return (this->getBalance() / 1000) * 5; }
 	};
 
 	// 직불계좌 클래스
